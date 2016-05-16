@@ -10,12 +10,17 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
+import org.apache.log4j.PropertyConfigurator;
 
 
 /**
  * Created by Y on 2016/5/15.
  */
 public class TimeServer {
+
+    static {
+        PropertyConfigurator.configure("log4j.properties");
+    }
 
     public void bind(int port) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();

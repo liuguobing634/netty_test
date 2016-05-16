@@ -1,0 +1,10 @@
+package netty;
+option java_package = "demo.netty.protobuf";
+option java_outer_classname = "SubscribeReqProto";
+
+message SubscribeReq{
+    required int32 subReqID = 1;
+    required string userName = 2;
+    required string produceName = 3;
+    required string address = 4;
+}

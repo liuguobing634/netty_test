@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <div>
+        <input id="message"><button onclick="sendMessage()">发送</button>
+    </div>
+<ul id="messages">
+    <li>接受消息</li>
+</ul>
+    <script>
+
+        if (WebSocket) {
+            var socket = new WebSocket("ws://127.0.0.1:8080/websocket");
+            var messages = document.getElementById("messages");
+            socket.onopen = function (evt) {
+                messages.innerHTML = messages.innerHTML +"<li>连接成功，可以准备发送</li>"
+            };
+            socket.onclose = function () {
+                messages.innerHTML = messages.innerHTML +"<li>连接关闭</li>"
+            };
+            socket.onmessage = function (evt) {
+                messages.innerHTML = messages.innerHTML +"<li>来自服务器端的消息:"+evt.data+"</li>"
+            };
+            socket.onerror = function (evt) {
+                messages.innerHTML = messages.innerHTML +"<li>来自服务器端的错误:"+evt.data+"</li>"
+            };
+            sendMessage = function () {
+                var message = document.getElementById("message").value;
+                console.log(message);
+                socket.send(message);
+            }
+        }else {
+            alert("您的浏览器不支持")
+        }
+    </script>
+</body>
+</html>

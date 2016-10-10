@@ -21,32 +21,29 @@ public class HttpFileServer {
     private static final String DEFAULT_URL = "/src/";
 
     public void run(final int port, final String url) throws Exception {
-        new Server().createGroups(new ServerGroups() {
-            @Override
-            public void group(EventLoopGroup bossGroup, EventLoopGroup workerGroup) throws Exception {
-                ServerBootstrap b = new ServerBootstrap();
-                //
+        new Server().createGroups((bossGroup, workerGroup) -> {
+            ServerBootstrap b = new ServerBootstrap();
+            //
 
-                b.group(bossGroup,workerGroup)
-                        .channel(NioServerSocketChannel.class)
-                        .childHandler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            protected void initChannel(SocketChannel ch) throws Exception {
-                                ChannelPipeline pipeline = ch.pipeline();
+            b.group(bossGroup,workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline pipeline = ch.pipeline();
 //                                pipeline.addLast(new HttpServerCodec());
-                                pipeline.addLast("http-decoder",new HttpRequestDecoder());
-                                pipeline.addLast("http-aggregator",new HttpObjectAggregator(65536));
-                                pipeline.addLast("http-chunked",new ChunkedWriteHandler());
-                                pipeline.addLast("http-encoder",new HttpResponseEncoder());
+                            pipeline.addLast("http-decoder",new HttpRequestDecoder());
+                            pipeline.addLast("http-aggregator",new HttpObjectAggregator(65536));
+                            pipeline.addLast("http-chunked",new ChunkedWriteHandler());
+                            pipeline.addLast("http-encoder",new HttpResponseEncoder());
 
-                                pipeline.addLast("fileServerHandler",new HttpFileServerHandler(url));
-                            }
-                        });
+                            pipeline.addLast("fileServerHandler",new HttpFileServerHandler(url));
+                        }
+                    });
 
-                ChannelFuture f = b.bind("127.0.0.1",port).sync();
-                System.out.println("HTTP 文件目录服务启动成功，网址是: " + "http://127.0.0.1:" + port + url);
-                f.channel().closeFuture().sync();
-            }
+            ChannelFuture f = b.bind("127.0.0.1",port).sync();
+            System.out.println("HTTP 文件目录服务启动成功，网址是: " + "http://127.0.0.1:" + port + url);
+            f.channel().closeFuture().sync();
         });
     }
 
